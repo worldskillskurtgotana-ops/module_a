@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Folder to ZIP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+
+<body>
+
+    <h2>Compress Folder to ZIP</h2>
+
+    <input type="file" id="folderInput" webkitdirectory multiple>
+    <br><br>
+
+    <button id="compressBtn" onclick="compress()" disabled>
+        Compress to ZIP
+    </button>
+
+    <script>
+
+        const folderInput = document.getElementById("folderInput");
+        const compressBtn = document.getElementById("compressBtn");
+
+        /* Enable button only when files are selected */
+        folderInput.addEventListener("change", () => {
+            if (folderInput.files.length > 0) {
+                compressBtn.disabled = false;
+            } else {
+                compressBtn.disabled = true;
+            }
+        });
+
+        async function compress() {
+
+            const files = folderInput.files;
+
+            /* Extra safety check */
+            if (files.length === 0) {
+                alert("Please upload a folder first.");
+                return;
+            }
+
+            const zip = new JSZip();
+
+            for (let file of files) {
+
+                const content = await file.arrayBuffer();
+                zip.file(file.webkitRelativePath, content);
+
+            }
+
+            zip.generateAsync({ type: "blob" })
+                .then(function (blob) {
+
+                    const a = document.createElement("a");
+                    a.href = URL.createObjectURL(blob);
+                    a.download = "compressed.zip";
+                    a.click();
+
+                });
+
+        }
+
+    </script>
+
+</body>
+
+</html>
